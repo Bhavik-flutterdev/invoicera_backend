@@ -55,7 +55,7 @@ const loginWithEmail = async (req, res) => {
         mobile: "",
         email,
         fcm,
-
+mpin
     });
 
     const createdUser = await User.findById(newUser._id).select(
