@@ -6,6 +6,7 @@ const reistrationValidationSchema = Joi.object().keys({
   password: Joi.string().min(8).required(),
   confirmPassword: Joi.string().valid(Joi.ref('password')).required(),
   fcm: Joi.string(),
+  mpin:Joi.string().min(4).required()
 });
 
 export {reistrationValidationSchema};
