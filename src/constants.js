@@ -1,1 +1,1 @@
-export const DB_NAME="invoicera";
+export const DB_NAME="esportsArena";
