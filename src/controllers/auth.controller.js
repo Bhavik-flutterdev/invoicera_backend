@@ -19,19 +19,14 @@ const generateAccessAndRefereshTokens = async (userId) => {
     try {
         const user = await User.findById(userId)
         const accessToken = user.generateAccessToken()
-        const refreshToken = user.generateRefreshToken()
-
-        user.refreshToken = refreshToken
-        await user.save({validateBeforeSave: false})
-
-        return {accessToken, refreshToken}
+        console.log(accessToken)
+        return {accessToken}
 
 
     } catch (error) {
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
-
 
 
 const sendOtp = async (req, res) => {
@@ -72,18 +67,24 @@ const verifyOtp = async (req, res) => {
             );
         }
 
-        const otpDetails = await  Otp.findOne({_id: device_id, otp: otp})
+        const otpDetails = await Otp.findOne({_id: device_id, otp: otp})
 
         if (otpDetails) {
-            const userDetails =await User.findOne({phone: otpDetails.phone})
+            const userDetails = await User.findOne({phone: otpDetails.phone})
             let isNew = true;
             if (!isUnder5Minutes(otpDetails.createdAt)) {
-                return res.status(401).json(new ApiResponse(401, {},"Otp is Expired"))
+                return res.status(401).json(new ApiResponse(401, {}, "Otp is Expired"))
             }
+            let authToken = "";
             if (userDetails) {
                 isNew = false;
+                authToken = generateAccessAndRefereshTokens(userDetails._id);
+            } else {
+                const user = await User.create({phone: otpDetails.phone})
+                const tempToken = await generateAccessAndRefereshTokens(user._id);
+                authToken = tempToken.accessToken
             }
-            return res.status(200).json(new ApiResponse(200, {isNew, user: userDetails}, "Otp Verify Successfully",
+            return res.status(200).json(new ApiResponse(200, {isNew,authToken, user: userDetails}, "Otp Verify Successfully",
             ))
         } else {
             return res.status(401).json(new ApiError(401, "Otp Verification Failed"))
@@ -95,5 +96,5 @@ const verifyOtp = async (req, res) => {
 }
 
 
-export { sendOtp, verifyOtp}
+export {sendOtp, verifyOtp}
 

@@ -1,33 +1,29 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 
 const userSchema = new mongoose.Schema({
 
     name: {
         type: String,
-        required: true,
-        unique: false,
+        default: ""
     },
-    mobile: {
-        type: String,
-        required: false,
-        unique: false,
+    phone: {
+        type: String, default: ""
     },
     dob: {
-        type: String, required: false,
-
+        type: String, default: ""
     },
     gender: {
         type: String,
-        enum: ['Male', 'Female']
+        enum: ['Male', 'Female', ""],
+        default: ""
     },
-    profile_image: {type: String},
+    profile_image: {type: String, default: ""},
     balance: String,
     fcm: {
-        type: String,
-        required: false,
-
+        type: String, default: ""
     },
 
 }, {timestamps: true});
@@ -45,10 +41,7 @@ const userSchema = new mongoose.Schema({
 // }
 
 userSchema.methods.generateAccessToken = function () {
-
+    return jwt.sign({_id: this._id,}, "9b76d043a5c9e7f1d3b5c2a1e4f6g8h9i0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6",)
 }
-userSchema.methods.generateRefreshToken = function () {
-}
-
 
 export const User = mongoose.model('User', userSchema);
